@@ -29,13 +29,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
     _loadAudio();
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    widget.playerService.stop();
-  }
-
   Future<void> _loadAudio() async {
     try {
       final audioInfo = await YoutubeDownloader.getAudioStream(widget.videoUrl);
@@ -62,180 +55,180 @@ class _PlayerScreenState extends State<PlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: TColorTheme.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.keyboard_arrow_down),
-          onPressed: () => Navigator.pop(context),
-          color: Colors.white,
+        backgroundColor: TColorTheme.backgroundColor,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.keyboard_arrow_down),
+            onPressed: () => Navigator.pop(context),
+            color: Colors.white,
+          ),
+          title: const Text('Now Playing', style: TextStyle(color: Colors.white),),
+          centerTitle: true,
         ),
-        title: const Text('Now Playing', style: TextStyle(color: Colors.white),),
-        centerTitle: true,
-      ),
-      body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+        body: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : _error != null
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error loading audio: $_error',
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _loadAudio,
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
                     children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Error loading audio: $_error',
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadAudio,
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                )
-              : Column(
-                  children: [
-                    // Album Art
-                    Expanded(
-                      flex: 2,
-                      child: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 10.0),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.network(
-                              _audioInfo!['thumbnailUrl'],
-                              fit: BoxFit.cover,
+                      // Album Art
+                      Expanded(
+                        flex: 2,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 10.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.network(
+                                _audioInfo!['thumbnailUrl'],
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    // Song Info
-                    Expanded(
-                      flex: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              _audioInfo!['title'],
-                              style: const TextStyle(
-                                color: TColorTheme.textPrimary,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
+                      // Song Info
+                      Expanded(
+                        flex: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _audioInfo!['title'],
+                                style: const TextStyle(
+                                  color: TColorTheme.textPrimary,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _audioInfo!['author'],
-                              style: TextStyle(
-                                color: TColorTheme.textSecondary,
-                                fontSize: 18,
+                              const SizedBox(height: 8),
+                              Text(
+                                _audioInfo!['author'],
+                                style: TextStyle(
+                                  color: TColorTheme.textSecondary,
+                                  fontSize: 18,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 32),
-                            // Progress Bar
-                            StreamBuilder<Duration?>(
-                              stream: widget.playerService.positionStream,
-                              builder: (context, snapshot) {
-                                final position = snapshot.data ?? Duration.zero;
-                                return StreamBuilder<Duration?>(
-                                  stream: widget.playerService.durationStream,
-                                  builder: (context, snapshot) {
-                                    final duration = snapshot.data ?? Duration.zero;
-                                    return ProgressBar(
-                                      progress: position,
-                                      total: duration,
-                                      onSeek: (position) {
-                                        widget.playerService.seek(position);
-                                      },
-                                      progressBarColor: TColorTheme.primaryColor,
-                                      baseBarColor: TColorTheme.textSecondary.withOpacity(0.2),
-                                      thumbColor: TColorTheme.primaryColor,
-                                      timeLabelTextStyle: TextStyle(
-                                        color: TColorTheme.textSecondary,
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 32),
-                            // Playback Controls
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.shuffle),
-                                  color: TColorTheme.textPrimary,
-                                  onPressed: () {
-                                    // TODO: Implement shuffle
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.skip_previous),
-                                  color: TColorTheme.textPrimary,
-                                  iconSize: 48,
-                                  onPressed: () {
-                                    // TODO: Implement previous
-                                  },
-                                ),
-                                StreamBuilder<bool>(
-                                  stream: widget.playerService.playerStateStream.map((state) => state.playing),
-                                  builder: (context, snapshot) {
-                                    final isPlaying = snapshot.data ?? false;
-                                    return IconButton(
-                                      icon: Icon(
-                                        isPlaying ? Icons.pause_circle : Icons.play_circle,
-                                      ),
-                                      color: TColorTheme.primaryColor,
-                                      iconSize: 64,
-                                      onPressed: () {
-                                        if (isPlaying) {
-                                          widget.playerService.pause();
-                                        } else {
-                                          widget.playerService.play();
-                                        }
-                                      },
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.skip_next),
-                                  color: TColorTheme.textPrimary,
-                                  iconSize: 48,
-                                  onPressed: () {
-                                    // TODO: Implement next
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.repeat),
-                                  color: TColorTheme.textPrimary,
-                                  onPressed: () {
-                                    // TODO: Implement repeat
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
+                              const SizedBox(height: 32),
+                              // Progress Bar
+                              StreamBuilder<Duration?>(
+                                stream: widget.playerService.positionStream,
+                                builder: (context, snapshot) {
+                                  final position = snapshot.data ?? Duration.zero;
+                                  return StreamBuilder<Duration?>(
+                                    stream: widget.playerService.durationStream,
+                                    builder: (context, snapshot) {
+                                      final duration = snapshot.data ?? Duration.zero;
+                                      return ProgressBar(
+                                        progress: position,
+                                        total: duration,
+                                        onSeek: (position) {
+                                          widget.playerService.seek(position);
+                                        },
+                                        progressBarColor: TColorTheme.primaryColor,
+                                        baseBarColor: TColorTheme.textSecondary.withOpacity(0.2),
+                                        thumbColor: TColorTheme.primaryColor,
+                                        timeLabelTextStyle: TextStyle(
+                                          color: TColorTheme.textSecondary,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 32),
+                              // Playback Controls
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.shuffle),
+                                    color: TColorTheme.textPrimary,
+                                    onPressed: () {
+                                      // TODO: Implement shuffle
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.skip_previous),
+                                    color: TColorTheme.textPrimary,
+                                    iconSize: 48,
+                                    onPressed: () {
+                                      // TODO: Implement previous
+                                    },
+                                  ),
+                                  StreamBuilder<bool>(
+                                    stream: widget.playerService.playerStateStream.map((state) => state.playing),
+                                    builder: (context, snapshot) {
+                                      final isPlaying = snapshot.data ?? false;
+                                      return IconButton(
+                                        icon: Icon(
+                                          isPlaying ? Icons.pause_circle : Icons.play_circle,
+                                        ),
+                                        color: TColorTheme.primaryColor,
+                                        iconSize: 64,
+                                        onPressed: () {
+                                          if (isPlaying) {
+                                            widget.playerService.pause();
+                                          } else {
+                                            widget.playerService.play();
+                                          }
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.skip_next),
+                                    color: TColorTheme.textPrimary,
+                                    iconSize: 48,
+                                    onPressed: () {
+                                      // TODO: Implement next
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.repeat),
+                                    color: TColorTheme.textPrimary,
+                                    onPressed: () {
+                                      // TODO: Implement repeat
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-    );
+                    ],
+                  ),
+      );
   }
 } 
