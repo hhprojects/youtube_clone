@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/homepage_widgets/videocard_widget.dart';
 import '../theme/app_colors.dart';
+import '../services/audio_player_service.dart';
+import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import '../utils/youtube_downloader.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,6 +15,43 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  late final AudioPlayerService _playerService;
+  List<Video> _songs = [];
+  bool _isLoadingSongs = true;
+
+  Future<void> getTrendingSongs() async {
+    _songs = await YoutubeDownloader.getTrendingSongs();
+    setState(() {
+      _isLoadingSongs = false;
+    });
+  }
+
+  Future<void> searchSongs(String query) async{
+    setState(() {
+      _isLoadingSongs = true;
+    });
+    
+    var songs = await YoutubeDownloader.search(query);
+
+    setState(() {
+      _songs = songs;
+      _isLoadingSongs = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _playerService = AudioPlayerService();
+    _playerService.init();
+    getTrendingSongs();
+  }
+
+  @override
+  void dispose() {
+    _playerService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +79,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        
       ),
       body: Column(
         children: [
@@ -72,15 +111,18 @@ class _HomePageState extends State<HomePage> {
           ),
           // Video list
           Expanded(
-            child: ListView.builder(
-              itemCount: 10,
+            child: _isLoadingSongs ? const Center(child: CircularProgressIndicator()) : 
+            ListView.builder(
+              itemCount: _songs.length,
               itemBuilder: (context, index) {
                 return VideoCard(
-                  thumbnail: 'https://picsum.photos/seed/$index/300/200',
-                  title: 'Video Title ${index + 1}',
-                  views: '${(index + 1) * 100}K views',
-                  uploadTime: '${index + 1} months ago',
-                  duration: '${index + 1}:00',
+                  thumbnail: _songs[index].thumbnails.highResUrl,
+                  title: _songs[index].title,
+                  views: '${_songs[index].engagement.viewCount} views',
+                  uploadTime: _songs[index].uploadDate ?? DateTime.now(),
+                  duration: _songs[index].duration.toString(),
+                  videoUrl: _songs[index].url,
+                  playerService: _playerService,
                 );
               },
             ),

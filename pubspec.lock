@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.25"
+  audio_video_progress_bar:
+    dependency: "direct main"
+    description:
+      name: audio_video_progress_bar
+      sha256: "552b1f73c56c4c88407999e0a8507176f60c56de3e6d63bc20a0eab48467d4c9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   boolean_selector:
     dependency: transitive
     description:
@@ -641,10 +649,10 @@ packages:
     dependency: "direct main"
     description:
       name: youtube_explode_dart
-      sha256: f226459955b3de3e4cdd88bb4098dd7fed0261ac3f41485e2b8bbfb2f7c9ddc5
+      sha256: "2121f287459f19e0e8c6c0f0b80445ad78b3751809591b632ac8fed5decc20b6"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.10"
+    version: "2.4.1"
 sdks:
   dart: ">=3.7.0 <4.0.0"
   flutter: ">=3.27.0"
