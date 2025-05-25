@@ -69,8 +69,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
         leading: IconButton(
           icon: const Icon(Icons.keyboard_arrow_down),
           onPressed: () => Navigator.pop(context),
+          color: Colors.white,
         ),
-        title: const Text('Now Playing'),
+        title: const Text('Now Playing', style: TextStyle(color: Colors.white),),
         centerTitle: true,
       ),
       body: _isLoading
@@ -105,10 +106,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   children: [
                     // Album Art
                     Expanded(
-                      flex: 3,
+                      flex: 2,
                       child: Center(
                         child: Padding(
-                          padding: const EdgeInsets.all(32.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 10.0),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Image.network(
@@ -121,7 +122,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                     // Song Info
                     Expanded(
-                      flex: 2,
+                      flex: 4,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24.0),
                         child: Column(

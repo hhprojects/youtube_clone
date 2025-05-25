@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoadingSongs = true;
     });
-    
+
     var songs = await YoutubeDownloader.search(query);
 
     setState(() {
@@ -107,6 +107,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
+              onSubmitted: (query) => searchSongs(query)
             ),
           ),
           // Video list
@@ -145,8 +146,8 @@ class _HomePageState extends State<HomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: 'Explore',
+            icon: Icon(Icons.featured_play_list),
+            label: 'Playlist',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.library_music),

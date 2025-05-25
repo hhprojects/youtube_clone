@@ -47,6 +47,7 @@ class AudioPlayerService {
   Future<void> play() => _audioPlayer.play();
   Future<void> pause() => _audioPlayer.pause();
   Future<void> stop() => _audioPlayer.stop();
+  Future<void> previous() => _audioPlayer.seekToPrevious();
   Future<void> seek(Duration position) => _audioPlayer.seek(position);
   Future<void> setVolume(double volume) => _audioPlayer.setVolume(volume);
   
