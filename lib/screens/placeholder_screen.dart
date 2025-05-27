@@ -3,11 +3,8 @@ import '../theme/app_colors.dart';
 
 class PlaceholderScreen extends StatelessWidget {
   final String title;
-  
-  const PlaceholderScreen({
-    super.key,
-    required this.title,
-  });
+
+  const PlaceholderScreen({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +12,7 @@ class PlaceholderScreen extends StatelessWidget {
       backgroundColor: TColorTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: TColorTheme.backgroundColor,
-        title: Text(
-          title,
-          style: TextStyle(color: TColorTheme.textPrimary),
-        ),
+        title: Text(title, style: TextStyle(color: TColorTheme.textPrimary)),
       ),
       body: Center(
         child: Text(
@@ -32,4 +26,4 @@ class PlaceholderScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

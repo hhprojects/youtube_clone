@@ -4,15 +4,17 @@ import '../theme/app_colors.dart';
 import '../services/audio_player_service.dart';
 import 'home_screen.dart';
 import 'placeholder_screen.dart';
+import '../widgets/homepage_widgets/mini_player_widget.dart';
+import 'player_screen.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class MainNavigationScreen extends StatefulWidget {
+  const MainNavigationScreen({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _MainNavigationScreenState extends State<MainNavigationScreen> {
   int _selectedIndex = 0;
   late final AudioPlayerService _playerService;
   late final List<Widget> _screens;
@@ -22,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _playerService = AudioPlayerService();
     _playerService.init();
-    
+
     _screens = [
       HomeScreen(playerService: _playerService),
       const PlaceholderScreen(title: 'Playlist'),
@@ -47,7 +49,8 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         title: Row(
           children: [
-            Icon(Icons.play_circle_outline, 
+            Icon(
+              Icons.play_circle_outline,
               color: TColorTheme.primaryColor[300],
               size: 32,
             ),
@@ -63,7 +66,43 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: _screens[_selectedIndex],
+      body: Stack(
+        children: [
+          _screens[_selectedIndex],
+          // Mini player overlay
+          StreamBuilder<bool>(
+            stream: _playerService.playerStateStream.map(
+              (state) => state.playing,
+            ),
+            builder: (context, snapshot) {
+              final isPlaying = snapshot.data ?? false;
+              if (!isPlaying) return const SizedBox.shrink();
+
+              return Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: MiniPlayer(
+                  playerService: _playerService,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => PlayerScreen(
+                              playerService: _playerService,
+                              videoUrl:
+                                  'current_video_url', // You'll need to track this
+                            ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
@@ -75,10 +114,7 @@ class _HomePageState extends State<HomePage> {
         selectedItemColor: TColorTheme.primaryColor[300],
         unselectedItemColor: TColorTheme.bottomNavUnselected,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(
             icon: Icon(Icons.featured_play_list),
             label: 'Playlist',

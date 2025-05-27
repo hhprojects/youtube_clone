@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/homepage.dart';
+import 'screens/main_navigation_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomePage(),
+      home: const MainNavigationScreen(),
     );
   }
 }
